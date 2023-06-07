@@ -8,7 +8,26 @@ class BooksController < ApplicationController
   end
 
   def index
-    @books = Book.all
+    # 課題7aで不要に
+    # @books = Book.all
+    
+    # 1週間以内のFavoritesを取得するための日付を算出
+    one_week_ago = Time.current - 1.week
+
+    # 一週間内にいいねがついた本をいいねの数順に取得
+    @books_with_recent_favorites = Book.left_joins(:favorites)
+      .where(favorites: { created_at: one_week_ago..Time.current })
+      .group('books.id')
+      .order('COUNT(favorites.id) DESC')
+
+    # それ以外の本（一週間内にいいねがついていない本）を投稿日順に取得
+    @books_without_recent_favorites = Book.left_joins(:favorites)
+      .where.not(id: @books_with_recent_favorites.pluck(:id))
+      .order(created_at: :desc)
+
+    # 上記2つのリストを結合
+    @books = @books_with_recent_favorites + @books_without_recent_favorites
+    
     @book = Book.new
   end
 
