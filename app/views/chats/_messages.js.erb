@@ -1,0 +1,18 @@
+<div class="chat-messages">
+  <% chats.each do |chat| %>
+    <% if chat.user_id == current_user.id %>
+      <div class="message self my-2">
+        <div class="message-body bg-primary text-white rounded p-2">
+          <%= chat.message %>
+        </div>
+      </div>
+    <% else %>
+      <div class="message other my-2">
+        <div class="message-sender"></div>
+        <div class="message-body bg-light rounded p-2">
+          <%= chat.message %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

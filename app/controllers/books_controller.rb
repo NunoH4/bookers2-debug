@@ -11,22 +11,26 @@ class BooksController < ApplicationController
     # 課題7aで不要に
     # @books = Book.all
     
-    # 1週間以内のFavoritesを取得するための日付を算出
-    one_week_ago = Time.current - 1.week
-
-    # 一週間内にいいねがついた本をいいねの数順に取得
-    @books_with_recent_favorites = Book.left_joins(:favorites)
-      .where(favorites: { created_at: one_week_ago..Time.current })
-      .group('books.id')
-      .order('COUNT(favorites.id) DESC')
-
-    # それ以外の本（一週間内にいいねがついていない本）を投稿日順に取得
-    @books_without_recent_favorites = Book.left_joins(:favorites)
-      .where.not(id: @books_with_recent_favorites.pluck(:id))
-      .order(created_at: :desc)
-
-    # 上記2つのリストを結合
-    @books = @books_with_recent_favorites + @books_without_recent_favorites
+    # 現在の日時を取得し、その日の終了時刻を代入します。
+    to  = Time.current.at_end_of_day
+    
+    # 現在日時から6日前の日時を取得し、その日の開始時刻を代入します。
+    # これにより直近の1週間の期間を取得します。
+    from  = (to - 6.day).at_beginning_of_day
+    
+    # 全てのBookを取得します。
+    @books = Book.all.sort {|a,b| 
+    
+      # それぞれの本（aとb）に対して、直近の1週間でのいいねの数を計算します。
+      # そして、そのいいねの数を使って本をソートします。
+      # Rubyの<=>演算子（宇宙船演算子）は、
+      # 左の値が大きければ1、等しければ0、小さければ-1を返します。
+      # つまり、bのいいねの数が多ければ1、等しければ0、少なければ-1が返されます。
+      # Arrayのsortメソッドは、ブロックが1を返すときに要素を入れ替えます。
+      # したがって、このコードはいいねの数が多い本を前にするように本をソートします。
+      b.favorites.where(created_at: from...to).size <=> 
+      a.favorites.where(created_at: from...to).size
+    }
     
     @book = Book.new
   end

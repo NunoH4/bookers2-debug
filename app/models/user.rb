@@ -5,8 +5,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :books, dependent: :destroy
-  has_many :favorites, dependent: :destroy
   has_many :book_comments, dependent: :destroy
+  has_many :favorites, dependent: :destroy
   has_one_attached :profile_image
 
 
@@ -52,5 +52,9 @@ class User < ApplicationRecord
       User.where('name LIKE ?', '%' + content + '%')
     end
   end
-  
+
+has_many :user_rooms
+has_many :chats
+has_many :rooms, through: :user_rooms
+
 end

@@ -1,0 +1,23 @@
+<div class="chat-container container">
+  <div class="chat-topbar">
+    <h2><%= @user.name %> さんとのチャット</h2>
+  </div>
+  <div class="message">
+    <%= render partial: "chats/messages", formats: :js, locals: { chats: @chats } %>
+  </div>
+
+  <div class="chat-form mt-3">
+    <%= form_with model: @chat, data: {remote: true} do |f| %>
+      <div class="errors">
+        <%= render "layouts/errors", obj: f.object %>
+      </div>
+      
+      <%= f.text_field :message, placeholder: "メッセージを入力してください", autocomplete: "off", class: 'form-control' %>
+      <%= f.hidden_field :room_id, value: @room.id %>
+      
+      <div class="input-group-append">
+        <%= f.submit "送信" %>
+      </div>
+    <% end %>
+  </div>
+</div>
