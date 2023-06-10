@@ -23,6 +23,9 @@
           コメント数: <span id="comment_count"><%= book.book_comments.count %></span>
         </td>
         <td>
+          <%= render "books/static_rate", book: book %>
+        </td>
+        <td>
           <p class="view-count">閲覧数: <%= book.view_counts.count %></p>
         </td>
       </tr>
