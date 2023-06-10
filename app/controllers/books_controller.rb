@@ -5,6 +5,10 @@ class BooksController < ApplicationController
     @book = Book.find(params[:id])
     @post_book = Book.new
     @book_comment = BookComment.new
+    @book_detail = Book.find(params[:id])
+    unless ViewCount.find_by(user_id: current_user.id, book_id: @book_detail.id)
+      current_user.view_counts.create(book_id: @book_detail.id)
+    end
   end
 
   def index
@@ -13,14 +17,11 @@ class BooksController < ApplicationController
     
     # 現在の日時を取得し、その日の終了時刻を代入します。
     to  = Time.current.at_end_of_day
-    
     # 現在日時から6日前の日時を取得し、その日の開始時刻を代入します。
     # これにより直近の1週間の期間を取得します。
     from  = (to - 6.day).at_beginning_of_day
-    
     # 全てのBookを取得します。
     @books = Book.all.sort {|a,b| 
-    
       # それぞれの本（aとb）に対して、直近の1週間でのいいねの数を計算します。
       # そして、そのいいねの数を使って本をソートします。
       # Rubyの<=>演算子（宇宙船演算子）は、
@@ -31,7 +32,6 @@ class BooksController < ApplicationController
       b.favorites.where(created_at: from...to).size <=> 
       a.favorites.where(created_at: from...to).size
     }
-    
     @book = Book.new
   end
 
